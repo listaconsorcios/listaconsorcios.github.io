@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Administradores de consorcio e inmobiliarias: la lista de los vecinos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f4f1ea; --ink:#1c1b19; --muted:#6b675e; --line:#d9d3c5; --card:#fffdf8;
+  --bad:#b4371f; --bad-bg:#f7e4dd; --good:#2f6b3a; --good-bg:#dfeedd; --accent:#1c1b19;
+}
+@media (prefers-color-scheme: dark){
+  :root{--bg:#161513;--ink:#ece8df;--muted:#a19c90;--line:#34312b;--card:#1e1d1a;--bad:#e7735a;--bad-bg:#3a201a;--good:#7fc08a;--good-bg:#1c2d1f;--accent:#ece8df}
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Archivo,system-ui,sans-serif;line-height:1.4}
+.wrap{max-width:860px;margin:0 auto;padding:20px 16px 60px}
+header h1{font-size:clamp(26px,6vw,40px);line-height:1.05;margin:8px 0 10px;font-weight:800;letter-spacing:-.02em}
+.kicker{font-family:"IBM Plex Mono",monospace;font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.lead{color:var(--muted);margin:0 0 14px;font-size:15px}
+.lead a{color:inherit}
+.tabs{display:flex;gap:6px;margin:18px 0 12px;border-bottom:2px solid var(--ink)}
+.tab{appearance:none;border:0;background:none;font:inherit;font-weight:600;font-size:16px;padding:10px 14px;cursor:pointer;color:var(--muted);border-radius:8px 8px 0 0}
+.tab[aria-selected=true]{background:var(--ink);color:var(--bg)}
+.tools{display:flex;gap:8px;margin:12px 0 18px;flex-wrap:wrap}
+.tools input{flex:1;min-width:180px;padding:11px 12px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);font:inherit}
+.sec{margin:22px 0}
+.sec-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
+.sec-head h2{margin:0;font-size:20px;display:flex;align-items:center;gap:8px}
+.count{font-family:"IBM Plex Mono",monospace;font-size:13px;color:var(--muted);font-weight:400}
+.dot{width:12px;height:12px;border-radius:50%;display:inline-block}
+.good .dot{background:var(--good)} .bad .dot{background:var(--bad)}
+.btn{appearance:none;border:1.5px solid var(--ink);background:var(--ink);color:var(--bg);font:inherit;font-weight:600;font-size:14px;padding:9px 14px;border-radius:999px;cursor:pointer;white-space:nowrap}
+.btn.ghost{background:transparent;color:var(--ink)}
+.list{display:grid;gap:8px}
+.item{background:var(--card);border:1px solid var(--line);border-left:5px solid var(--line);border-radius:10px;padding:11px 13px}
+.good .item{border-left-color:var(--good)} .bad .item{border-left-color:var(--bad)}
+.item .name{font-weight:700;font-size:16px}
+.item .zone{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--muted);margin-left:6px}
+.item .why{margin:4px 0 0;font-size:14.5px}
+.item .src{margin-top:6px;font-family:"IBM Plex Mono",monospace;font-size:11.5px;color:var(--muted)}
+.item .src a{color:inherit}
+.badge{display:inline-block;font-family:"IBM Plex Mono",monospace;font-size:11px;padding:1px 7px;border-radius:999px;margin-left:6px;vertical-align:2px}
+.good .badge{background:var(--good-bg);color:var(--good)} .bad .badge{background:var(--bad-bg);color:var(--bad)}
+.empty{padding:16px;border:1px dashed var(--line);border-radius:10px;color:var(--muted);font-size:14px;text-align:center}
+form.add{background:var(--card);border:1.5px solid var(--ink);border-radius:12px;padding:14px;margin-bottom:12px;display:none;gap:10px}
+form.add.open{display:grid}
+form.add label{font-size:13px;font-weight:600;display:grid;gap:4px}
+form.add input,form.add textarea{padding:10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);font:inherit;font-weight:400}
+form.add textarea{min-height:70px;resize:vertical}
+.row{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
+.msg{font-size:13px;color:var(--muted)}
+.note{margin-top:34px;padding:14px;border-radius:10px;background:var(--card);border:1px solid var(--line);font-size:13.5px;color:var(--muted)}
+.note strong{color:var(--ink)}
+.banner{font-size:13px;padding:10px 12px;border-radius:10px;background:var(--bad-bg);color:var(--bad);margin:0 0 12px;display:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="kicker">Lista armada por vecinos · CABA y alrededores</div>
+    <h1>¿A quién (no) contratar?</h1>
+    <p class="lead">Administradores de consorcio e inmobiliarias mencionados por la gente. Arrancó con las respuestas a <a href="https://x.com/GabrielaInglese/status/2121770054823841910">este hilo de @GabrielaInglese</a>. Si tenés uno para sumar, bueno o malo, agregalo.</p>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <button class="tab" role="tab" data-cat="adm" aria-selected="true">Administradores</button>
+    <button class="tab" role="tab" data-cat="inm" aria-selected="false">Inmobiliarias</button>
+  </div>
+
+  <div id="banner" class="banner"></div>
+
+  <div class="tools">
+    <input id="q" type="search" placeholder="Buscar por nombre o zona…" aria-label="Buscar">
+  </div>
+
+  <section class="sec good">
+    <div class="sec-head">
+      <h2><span class="dot"></span>Recomendadas <span class="count" id="c-good"></span></h2>
+      <button class="btn" data-open="good">+ Agregar</button>
+    </div>
+    <form class="add" data-kind="good"></form>
+    <div class="list" id="l-good"></div>
+  </section>
+
+  <section class="sec bad">
+    <div class="sec-head">
+      <h2><span class="dot"></span>A evitar <span class="count" id="c-bad"></span></h2>
+      <button class="btn" data-open="bad">+ Agregar</button>
+    </div>
+    <form class="add" data-kind="bad"></form>
+    <div class="list" id="l-bad"></div>
+  </section>
+
+  <div class="note">
+    <strong>Ojo:</strong> son opiniones de usuarios, no están verificadas. Antes de votar un administrador en asamblea, chequeá que esté inscripto en el Registro Público de Administradores (RPA) de CABA y si tiene sanciones, y pedí liquidaciones de otro edificio que maneje. Las denuncias por incumplimiento de la Ley 941 se hacen online por TAD del GCBA.
+  </div>
+</div>
+
+<script>
+const THREAD = "https://x.com/GabrielaInglese/status/2121770054823841910";
+// Semilla: respuestas del hilo (16/11/2026). Resumidas en tono neutro.
+const SEED = [
+ // Recomendadas
+ ["adm","good","ARQON","", "Dedicados y atentos al detalle. En Instagram: arqon.adm.", "guada_alonso"],
+ ["adm","good","Administración LIN","CABA","Recomendada sin dudar. Matriculada en CABA.","bodegas_vinos"],
+ ["adm","good","Administración MyS","CABA","Recomendada como seria y decente.","uro_84"],
+ // A evitar
+ ["adm","bad","Administración Prack","CABA","Dolores de cabeza y pérdida de plata.","GabrielaInglese"],
+ ["adm","bad","Administración Casella","CABA","Dolores de cabeza y pérdida de plata.","GabrielaInglese"],
+ ["adm","bad","AJK – Jorge Kestelboim","CABA","Mencionada por dos personas.","GabrielaInglese, candylectora"],
+ ["adm","bad","Administración Ignacio Carman","CABA","","candylectora"],
+ ["adm","bad","Juan San Juan","","Libros sin regularizar, facturas de proveedores por trabajos no hechos, no daba la cara.","Shalton86"],
+ ["adm","bad","Marcelo Fridman","","Mencionado por varias personas.","BelenUrso, cuervoloco16"],
+ ["adm","bad","Administración Niebuhr","","","BelenUrso"],
+ ["adm","bad","Administración Yáñez","Zona Norte","Denuncian estafas en varios barrios.","MrXarg"],
+ ["adm","bad","Administración Devito","","Malos tratos y obras millonarias contratadas sin factura ni contrato.","Leoberistainlb"],
+ ["adm","bad","Eduardo Casado Sastre & Asociados","CABA","Mencionada por dos personas.","DelfiOdonnell, pauelffman"],
+ ["adm","bad","Administración Sverdlov","","Según el usuario, denunciada y obligada a devolver fondos.","Parisgilton1256"],
+ ["adm","bad","Administración GAMAR","","Al cambiarla aparecieron muchas inconsistencias.","ranciarabbit"],
+ ["adm","bad","RQ Administración","","","chini_ssi"],
+ ["adm","bad","Diego Golfetto","","","angeles14313"],
+ ["adm","bad","Administradora Galán","","","terra43210"],
+ ["adm","bad","Alejandra Todros","","No deja el consorcio y retiene el libro del edificio.","Maleficent1820"],
+ ["adm","bad","Administración Kleiner","","","feelingok2025"],
+ ["adm","bad","Miriam Boravina","CABA","Propietarios vendiendo por la administración.","ameliemover"],
+ ["adm","bad","Daniel Scarvaci","Boedo / Caballito","","donpedrobon"],
+ ["adm","bad","BAIS – Buenos Aires Integral Studio","","","Clotac"],
+ ["adm","bad","Gago","","","MaraTeresabf"],
+ ["adm","bad","Juan Carlos Sánchez (RPA 6582)","","Según el usuario, tiene denuncias y multas.","TatoGutierrez16"],
+ ["adm","bad","Baraldo (Baraldo y Laspa)","","Mencionada por dos personas.","pulporock, malegallesio"],
+ ["adm","bad","Administración del Norte SRL (Defelice hermanos)","","","locro897"],
+ ["adm","bad","Consorcios Balvi","","","dem_500"],
+ ["adm","bad","Denise Friedman","","","dem_500"],
+ ["adm","bad","Adm. Jalle","Núñez","","hippixxxx"],
+ ["adm","bad","Otalvares (Ezequiel y padre)","","Sin obras, sin respuesta, deudas con limpieza, libros desprolijos.","LaPoligriya"],
+ ["adm","bad","Luis Cajade","","Cambió varias veces el nombre de la administración.","Eowyn2001"],
+ ["adm","bad","Sormani","","","usonecesario"],
+ ["adm","bad","Monti / Schiaffino","La Matanza","","aleinadaloh"],
+ ["adm","bad","Juan Carlos Talice","","","cris_in"],
+ ["adm","bad","Consorcity","","","cris_in"],
+ ["adm","bad","Patricia Calomiti","","","cris_in"],
+ ["adm","bad","Juan Paz de Paz y Paz","","","cris_in"],
+ ["adm","bad","Jean Pierre Duran Mier","","","cris_in"],
+ ["adm","bad","Marcelo Álvarez","","","isitolin"],
+ ["adm","bad","Administración Guppy","","Según el usuario, se quedó con plata del personal de portería.","mariaushuaia"],
+ ["adm","bad","E&P – Estigarribia","CABA","Mencionada por dos personas (una junto a Renzo Lazo).","Hjg984, frontier_oil"],
+ ["adm","bad","Renzo Lazo","","","frontier_oil"],
+ ["adm","bad","Ana María Pesce","Monserrat","","frontier_oil"],
+ ["adm","bad","Adm. Margulis","","","anagalland"],
+ ["adm","bad","Administración Troya","CABA","","Dra_Cureta"],
+ ["adm","bad","Administración Grecia – van Tomme","CABA","Lenta e inoperante.","Dra_Cureta"],
+ ["adm","bad","Mendonca y Piran","CABA","","canjesanchez"],
+ ["adm","bad","Alejandro Lamberti","","","daniel440821687"],
+ ["adm","bad","Araujo y Labanca (AYLSA)","","Mencionada por dos personas.","miss_monaka, FRoitberg"],
+ ["adm","bad","Lederman","","Desde que se fue, las expensas bajaron a la mitad.","ItsmeAgus"],
+ ["adm","bad","Ricardo G. Vázquez (Nuevos Tiempos)","","","soyotrapessoa"],
+ ["adm","bad","Administración Romano","","","Cristina_la_one"],
+ ["adm","bad","Adm. Bremen","","","RickyPerezz"],
+ ["adm","bad","Pablo Raggi","","","ZAUER777"],
+ ["adm","bad","Administración Rojas","CABA","","leitag"],
+ ["adm","bad","Enzo Muriado","","","merinicolini"],
+ ["adm","bad","Mortola","","","pezperla"],
+ ["adm","bad","Verónica Silva Gómez","","","DiegoZaraza5"],
+ ["adm","bad","Administración Pol – Marisa Medina","","","juanmaquieira"],
+ ["adm","bad","Leandro Sommaruga","","","Elena42875585"],
+ ["adm","bad","Salomón","","Incompetencia.","hormigaatomicac"],
+ ["adm","bad","Adm. Tanat","","No responden mails ni teléfono.","mlauris7"],
+ ["adm","bad","José Manuel Gil","","","silPing20"],
+ ["adm","bad","Administración Archer","","Incompetencia y mala atención.","ferm10ok"],
+ ["adm","bad","Administración Yanzón","","","Decabonorino"],
+ ["adm","bad","Rodrigo Propiedades","Villa Urquiza","","diegoro84067983"],
+ ["adm","bad","Administración Nexus (Belén Bo)","","","MariGa330216"],
+ ["adm","bad","Administración Alonso","","","omargarbage"],
+ ["adm","bad","Ramés Oliva","","","p_angeler"],
+ ["adm","bad","Administración Justo (Romina y Sebastián Justo)","","No se hacen cargo, no atienden el teléfono.","MagaMabaMa"],
+ ["adm","bad","Ortega y Fillol","Villa Urquiza","Cobros poco claros, cuentas poco transparentes.","LazarteSantiag2"],
+ ["adm","bad","Romina Piñero Galván","","","MrDomyn"],
+ ["adm","bad","Plotek","","","ElbebedeCarril"],
+ ["adm","bad","Estudio Lima","","","AnitaInti"],
+ ["adm","bad","LyM Administración – Mario G. Gombach","","","leilalil28"],
+ ["adm","bad","Administración Aversa – Fernando Calderón","Av. Juramento","","DamianJartumi"],
+].map((r,i)=>({id:"seed"+i,cat:r[0],kind:r[1],name:r[2],zone:r[3],why:r[4],by:r[5],seed:true}));
+
+const SHEET_URL = "https://docs.google.com/spreadsheets/d/1i9FOrPXa_EbA0-TWiXCsHzQ9noRBNNETVXyqAeA8si0/gviz/tq?gid=1609842676";
+const FORM_POST = "https://docs.google.com/forms/d/e/1FAIpQLSfBF_747tVeYEp6Ki8FNeOpQYwidIAoAkUGf33Ct4Vz0NEYUQ/formResponse";
+const F = {cat:"entry.392449782",kind:"entry.169480357",name:"entry.1396780395",zone:"entry.1387939633",why:"entry.296369952",by:"entry.382601627"};
+
+let added = [];   // aportes de la gente (Google Sheet)
+let pending = []; // recién enviados, todavía no aparecen en el Sheet
+let cat = "adm", q = "";
+
+const $ = s => document.querySelector(s);
+const esc = s => String(s||"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const norm = s => String(s||"").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"");
+
+function render(){
+  const all = SEED.concat(added, pending).filter(e=>e.cat===cat);
+  const nq = norm(q);
+  for(const kind of ["good","bad"]){
+    const rows = all.filter(e=>e.kind===kind && (!nq || norm(e.name+" "+e.zone+" "+e.why).includes(nq)));
+    rows.sort((a,b)=> (b.ts||0)-(a.ts||0) || a.name.localeCompare(b.name,"es"));
+    $("#c-"+kind).textContent = rows.length ? "· "+rows.length : "";
+    const label = cat==="adm" ? (kind==="good"?"administración recomendada":"administración a evitar") : (kind==="good"?"inmobiliaria recomendada":"inmobiliaria a evitar");
+    $("#l-"+kind).innerHTML = rows.length ? rows.map(e=>`
+      <div class="item">
+        <div><span class="name">${esc(e.name)}</span>${e.zone?`<span class="zone">${esc(e.zone)}</span>`:""}${e.seed?"":`<span class="badge">${e.pending?"publicando…":"nuevo"}</span>`}</div>
+        ${e.why?`<p class="why">${esc(e.why)}</p>`:""}
+        <div class="src">${e.seed
+          ? `Fuente: ${e.by.split(", ").map(u=>"@"+esc(u)).join(", ")} en <a href="${THREAD}">el hilo</a>`
+          : `Sumado por ${e.by?esc(e.by):"alguien anónimo"}${e.ts?" · "+new Date(e.ts).toLocaleDateString("es-AR"):""}`}</div>
+      </div>`).join("")
+      : `<div class="empty">${nq?"Nada coincide con la búsqueda.":"Todavía no hay ninguna "+label+". Sumá la primera."}</div>`;
+  }
+}
+
+function formHTML(kind){
+  const what = cat==="adm" ? "administración" : "inmobiliaria";
+  return `
+    <label>Nombre de la ${what} *<input name="name" required maxlength="120" placeholder="Ej: Administración Tal"></label>
+    <label>Zona / barrio<input name="zone" maxlength="60" placeholder="Ej: Palermo, CABA"></label>
+    <label>${kind==="good"?"¿Por qué la recomendás?":"¿Qué pasó?"}<textarea name="why" maxlength="400" placeholder="Contalo en una o dos líneas, sin insultos ni datos personales."></textarea></label>
+    <label>Tu usuario (opcional)<input name="by" maxlength="40" placeholder="@vos"></label>
+    <div class="row"><span class="msg"></span><button type="button" class="btn ghost" data-cancel>Cancelar</button><button class="btn" type="submit">Publicar</button></div>`;
+}
+
+document.querySelectorAll("[data-open]").forEach(b=>b.addEventListener("click",()=>{
+  const kind=b.dataset.open, f=document.querySelector(`form[data-kind=${kind}]`);
+  if(f.classList.contains("open")){f.classList.remove("open");return;}
+  f.innerHTML=formHTML(kind); f.classList.add("open"); f.querySelector("input").focus();
+  f.querySelector("[data-cancel]").onclick=()=>f.classList.remove("open");
+}));
+
+document.querySelectorAll("form.add").forEach(f=>f.addEventListener("submit",async ev=>{
+  ev.preventDefault();
+  const msg=f.querySelector(".msg"), btn=f.querySelector("[type=submit]");
+  const d=Object.fromEntries(new FormData(f));
+  const name=(d.name||"").trim(); if(!name){msg.textContent="Falta el nombre.";return;}
+  const entry={cat, kind:f.dataset.kind, name:name.slice(0,120), zone:(d.zone||"").trim().slice(0,60), why:(d.why||"").trim().slice(0,400), by:(d.by||"").trim().slice(0,40), ts:Date.now(), pending:true};
+  btn.disabled=true; msg.textContent="Publicando…";
+  try{
+    const body=new URLSearchParams();
+    body.append(F.cat, entry.cat); body.append(F.kind, entry.kind); body.append(F.name, entry.name);
+    body.append(F.zone, entry.zone); body.append(F.why, entry.why); body.append(F.by, entry.by);
+    await fetch(FORM_POST,{method:"POST",mode:"no-cors",body});
+    pending.push(entry); f.classList.remove("open"); render();
+    setTimeout(load, 8000); setTimeout(load, 30000);
+  }catch(e){ msg.textContent="No se pudo publicar. Probá de nuevo."; }
+  btn.disabled=false;
+}));
+
+document.querySelectorAll(".tab").forEach(t=>t.addEventListener("click",()=>{
+  cat=t.dataset.cat;
+  document.querySelectorAll(".tab").forEach(x=>x.setAttribute("aria-selected",x===t));
+  document.querySelectorAll("form.add").forEach(f=>f.classList.remove("open"));
+  try{location.hash = cat==="inm"?"inmobiliarias":"";}catch(e){}
+  render();
+}));
+$("#q").addEventListener("input",e=>{q=e.target.value;render();});
+if(location.hash==="#inmobiliarias") document.querySelector('.tab[data-cat=inm]').click();
+
+render();
+
+// Lee el Sheet de respuestas (JSONP de Google Visualization, sin CORS)
+let loadN=0;
+function load(){
+  const cb="__sheet"+(++loadN);
+  const s=document.createElement("script");
+  const fail=setTimeout(()=>{ $("#banner").style.display="block"; $("#banner").textContent="No se pudieron cargar los aportes de otros vecinos. Probá recargar."; },12000);
+  window[cb]=res=>{
+    clearTimeout(fail); $("#banner").style.display="none";
+    try{
+      const cols=res.table.cols.map(c=>norm(c.label));
+      const ix=k=>cols.findIndex(c=>c.startsWith(k));
+      const I={t:0,cat:ix("categoria"),kind:ix("tipo"),name:ix("nombre"),zone:ix("zona"),why:ix("comentario"),by:ix("usuario")};
+      const val=(r,i)=> i<0||!r.c[i] ? "" : (r.c[i].v==null?"":String(r.c[i].v));
+      added = res.table.rows.map((r,n)=>{
+        const raw=val(r,I.t); const m=raw.match(/Date\((\d+),(\d+),(\d+),?(\d*),?(\d*)/);
+        const ts=m?new Date(+m[1],+m[2],+m[3],+(m[4]||0),+(m[5]||0)).getTime():0;
+        let c=norm(val(r,I.cat)), k=norm(val(r,I.kind));
+        c = c.startsWith("inm")?"inm":(c.startsWith("adm")?"adm":c);
+        k = /^(good|recom|buen)/.test(k)?"good":(/^(bad|evit|mal)/.test(k)?"bad":k);
+        return {id:"s"+n,cat:c,kind:k,name:val(r,I.name).trim(),zone:val(r,I.zone).trim(),why:val(r,I.why).trim(),by:val(r,I.by).trim(),ts};
+      }).filter(e=>e.name && (e.cat==="adm"||e.cat==="inm") && (e.kind==="good"||e.kind==="bad"));
+      pending = pending.filter(p=>!added.some(a=>a.name===p.name && a.kind===p.kind && a.cat===p.cat));
+      render();
+    }catch(e){}
+    delete window[cb]; s.remove();
+  };
+  s.src=SHEET_URL+"&tqx=responseHandler:"+cb+"&_="+Date.now();
+  s.onerror=()=>{};
+  document.head.appendChild(s);
+}
+load();
+</script>
+</body>
+</html>
